@@ -1,0 +1,110 @@
+/* print.css - Ultra-condensed 4-across layout */
+
+/* Hide print content on screen */
+.print-only {
+  display: none;
+}
+
+@media print {
+  /* Minimal page margins */
+  @page {
+    margin: 0.25in !important;
+  }
+  
+  /* Hide the React root div (screen content) */
+  #root {
+    display: none !important;
+  }
+  
+  /* Show only print content */
+  .print-only {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* 4 columns grid - fixed */
+  .print-exercises {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12pt !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Compact exercise items */
+  .print-exercise-item {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  
+  /* Header with number and name */
+  .print-exercise-header {
+    margin-bottom: 4pt !important;
+    text-align: center;
+    min-height: 28pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .print-exercise-number {
+    display: inline-block;
+    font-size: 11pt !important;
+    font-weight: bold;
+    color: #333;
+    margin-right: 4pt !important;
+  }
+  
+  .print-exercise-name {
+    display: inline;
+    font-size: 10pt !important;
+    font-weight: 600;
+    color: #333;
+    word-wrap: break-word;
+  }
+  
+  /* Thumbnail container */
+  .print-exercise-photo {
+    width: 100% !important;
+    aspect-ratio: 4/3;
+    max-height: 120pt !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4pt;
+  }
+  
+  .print-thumbnail {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+  
+  .print-no-image {
+    font-size: 8pt !important;
+    color: #999;
+    text-align: center;
+    padding: 10pt;
+  }
+  
+  /* Ensure no overflow */
+  * {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+  }
+  
+  /* Optimize for ink/toner */
+  img {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
