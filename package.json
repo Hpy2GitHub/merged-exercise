@@ -1,0 +1,36 @@
+{
+  "name": "merged-exercise-app",
+  "version": "1.0.0",
+  "description": "Exercise data collection and management app",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "lucide-react": "^0.263.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^3.22.4"
+  },
+  "scripts": {
+   "build:npm": "vite build --mode npm",
+   "build:apache": "vite build --mode apache",
+   "build:github": "vite build --mode github",
+   "build:check": "tsc && vite build",
+   "type-check": "tsc --noEmit", 
+   "preview": "vite preview",
+   "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/react": "^18.3.27",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "prettier": "3.8.1",
+    "prettier-plugin-tailwindcss": "0.7.2",
+    "tailwindcss": "3.4.19",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vite-plugin-pwa": "^1.2.0"
+  }
+}

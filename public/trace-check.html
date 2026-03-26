@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muscle Diagram Verifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .main-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .controls-container {
+            display: flex;
+            gap: 20px;
+        }
+        .control-panel {
+            width: 280px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .control-panel h3 {
+            margin: 0 0 10px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .file-input {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+        .control-panel label {
+            display: block;
+            margin: 6px 0;
+            font-size: 14px;
+        }
+        #diagrams {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .diagram-container {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .diagram-container h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Muscle Diagram Verifier</h1>
+    
+    <div class="main-container">
+        <!-- Controls: Split into two columns -->
+        <div class="controls-container">
+            <!-- Left: File + Radios -->
+            <div class="control-panel">
+                <div class="file-input">
+                    <strong>Load JSON:</strong><br>
+                    <input type="file" id="load-json" accept=".json,.txt" style="width:100%;">
+                </div>
+                <h3>Highlight One (Red)</h3>
+                <div id="radios">
+                    <!-- Radio buttons generated here -->
+                </div>
+            </div>
+
+            <!-- Right: Checkboxes -->
+            <div class="control-panel">
+                <h3>Select Multiple (Green)</h3>
+                <div id="checkboxes">
+                    <!-- Checkboxes generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagrams: Front and Back -->
+        <div id="diagrams">
+            <div class="diagram-container">
+                <h3>Front</h3>
+                <canvas id="canvas-front"></canvas>
+            </div>
+            <div class="diagram-container">
+                <h3>Back</h3>
+                <canvas id="canvas-back"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = null;
+        let muscleMap = {}; // name -> array of {side, muscle}
+        let selectedHighlight = null;
+        let selectedMuscles = new Set();
+
+        // Your working paths
+        const frontImg = new Image();
+        frontImg.src = 'images/muscles/front.png';
+        const backImg = new Image();
+        backImg.src = 'images/muscles/back.png';
+
+        const canvasFront = document.getElementById('canvas-front');
+        const ctxFront = canvasFront.getContext('2d');
+        const canvasBack = document.getElementById('canvas-back');
+        const ctxBack = canvasBack.getContext('2d');
+
+        Promise.all([
+            new Promise((res, rej) => { frontImg.onload = res; frontImg.onerror = rej; }),
+            new Promise((res, rej) => { backImg.onload = res; backImg.onerror = rej; })
+        ]).then(() => {
+            console.log('Images loaded');
+            resizeCanvases();
+            drawBoth();
+            // Auto-load the JSON file
+            autoLoadJSON();
+        }).catch(err => {
+            console.error('Image load failed:', err);
+            alert('Failed to load images. Check console for path errors.');
+        });
+
+        // Auto-load JSON from same directory
+        async function autoLoadJSON() {
+            const jsonFile = 'muscle-diagram-data.json'; // Change this if your file has a different name
+            try {
+                const response = await fetch(jsonFile);
+                if (!response.ok) {
+                    console.warn(`Could not auto-load ${jsonFile}: ${response.statusText}`);
+                    return;
+                }
+                data = await response.json();
+                console.log('Auto-loaded JSON from', jsonFile);
+                processData();
+            } catch (err) {
+                console.warn('Auto-load failed:', err);
+                // Silently fail - user can still manually load
+            }
+        }
+
+        function resizeCanvases() {
+            canvasFront.width = frontImg.width;
+            canvasFront.height = frontImg.height;
+            canvasBack.width = backImg.width;
+            canvasBack.height = backImg.height;
+        }
+
+        document.getElementById('load-json').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    data = JSON.parse(ev.target.result);
+                    console.log('JSON loaded');
+                    processData();
+                } catch (err) {
+                    alert('Invalid JSON: ' + err);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function processData() {
+            muscleMap = {};
+            const nameToSides = {};
+
+            ['front', 'back'].forEach(side => {
+                if (data[side]) {
+                    data[side].forEach(muscle => {
+                        const name = muscle.name;
+                        if (!nameToSides[name]) nameToSides[name] = [];
+                        nameToSides[name].push({ side, muscle });
+                    });
+                }
+            });
+
+            // Build muscleMap and check for true duplicates (same side twice)
+            for (const name in nameToSides) {
+                const entries = nameToSides[name];
+                const sides = entries.map(e => e.side);
+                const uniqueSides = [...new Set(sides)];
+                if (uniqueSides.length < sides.length) {
+                    console.warn(`True duplicate on same side: ${name}`);
+                    alert(`True duplicate on same side: ${name}`);
+                }
+                muscleMap[name] = entries; // array of one or two entries
+            }
+
+            const muscles = Object.keys(muscleMap).sort();
+
+            // === Radios ===
+            const radiosDiv = document.getElementById('radios');
+            radiosDiv.innerHTML = '<label><input type="radio" name="highlight" value="" checked> None</label><br>';
+            muscles.forEach(name => {
+                const entries = muscleMap[name];
+                const sideText = entries.map(e => e.side === 'front' ? 'F' : 'B').join('/');
+		console.log('radiosDiv' + ' ' + name + ' ' + sideText);
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'highlight';
+                input.value = name;
+                input.addEventListener('change', () => {
+                    selectedHighlight = input.checked ? name : null;
+                    drawBoth();
+                });
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(' ' + name + ' [' + sideText + ']'));
+                radiosDiv.appendChild(label);
+                radiosDiv.appendChild(document.createElement('br'));
+            });
+
+            // === Checkboxes ===
+            const checkboxesDiv = document.getElementById('checkboxes');
+            checkboxesDiv.innerHTML = '';
+            muscles.forEach(name => {
+                const entries = muscleMap[name];
+                const sideText = entries.map(e => e.side === 'front' ? 'F' : 'B').join('/');
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.value = name;
+                input.addEventListener('change', () => {
+                    if (input.checked) selectedMuscles.add(name);
+                    else selectedMuscles.delete(name);
+                    drawBoth();
+                });
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(' ' + name + ' [' + sideText + ']'));
+                checkboxesDiv.appendChild(label);
+                checkboxesDiv.appendChild(document.createElement('br'));
+            });
+
+            drawBoth();
+        }
+
+        function drawBoth() {
+            if (!frontImg.complete || !backImg.complete) return;
+
+            ctxFront.drawImage(frontImg, 0, 0);
+            ctxBack.drawImage(backImg, 0, 0);
+
+            // Red highlight (single selection)
+            if (selectedHighlight && muscleMap[selectedHighlight]) {
+                const entries = muscleMap[selectedHighlight];
+                entries.forEach(({ side, muscle }) => {
+                    const ctx = side === 'front' ? ctxFront : ctxBack;
+                    drawPixels(ctx, muscle.regions, 'rgba(255, 0, 0, 0.5)');
+                });
+            }
+
+            // Green multi-select
+            selectedMuscles.forEach(name => {
+                if (muscleMap[name]) {
+                    const entries = muscleMap[name];
+                    entries.forEach(({ side, muscle }) => {
+                        const ctx = side === 'front' ? ctxFront : ctxBack;
+                        drawPixels(ctx, muscle.regions, 'rgba(0, 255, 0, 0.5)');
+                    });
+                }
+            });
+        }
+
+        function drawPixels(ctx, regions, color) {
+            ctx.fillStyle = color;
+            regions.forEach(polygon => {
+                polygon.forEach(point => {
+                    ctx.fillRect(point.x, point.y, 1, 1);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
