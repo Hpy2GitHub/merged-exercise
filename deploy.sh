@@ -19,7 +19,7 @@ BACKUP_DIR="$BACKUP_BASE/$TIMESTAMP"
 # ── npm mode ──────────────────────────────────────────────────────────────────
 if [ "$1" = "npm" ]; then
   echo "🔧 Starting local dev server..."
-  npm run dev
+    npm run dev -- --mode npm  
   exit 0
 fi
 
