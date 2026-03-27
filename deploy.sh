@@ -39,6 +39,7 @@ if [ "$1" = "github" ]; then
     git commit -m "$COMMIT_MSG"
     git push origin main
     echo "✅ Pushed to GitHub! Actions will handle the deployment."
+    echo "Navigate to https://hpy2github.github.io/merged-exercise"
   else
     echo "⚠️  No changes detected, nothing to commit."
   fi

@@ -66,36 +66,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     },
   },
   {
-    name: 'Plank',
-    key: 'plank',
-    thumbnailLink: '/images/thumbnails/plank.jpg',
-    videoLink: '/videos/plank.mp4',
-    hasVideo: false,
-    description: 'An isometric core exercise that builds stability and endurance.',
-    primaryMuscle: 'Core',
-    musclesTargeted: ['Core', 'Shoulders', 'Glutes'],
-    equipment: ['Bodyweight'],
-    difficulty: 'Beginner',
-    instructions: [
-      'Begin in a forearm plank position with elbows directly under shoulders.',
-      'Keep your body in a straight line from head to heels.',
-      'Hold the position for the desired duration.',
-    ],
-    commonMistakes: [
-      'Allowing hips to rise too high or sag too low.',
-      'Holding your breath.',
-    ],
-    tips: [
-      'Squeeze your glutes and brace your abs.',
-      'Look at the floor to keep your neck neutral.',
-    ],
-    calculator: {
-      beginner:     { reps: '20s', lbs: '0', oneRepMax: '' },
-      intermediate: { reps: '45s', lbs: '0', oneRepMax: '' },
-      advanced:     { reps: '90s', lbs: '0', oneRepMax: '' },
-    },
-  },
-  {
     name: 'Dumbbell Row',
     key: 'dumbbell-row',
     thumbnailLink: '/images/thumbnails/dumbbell-row.jpg',
@@ -132,7 +102,7 @@ const DEFAULT_LISTS: ExerciseList[] = [
   {
     name: 'Full Body Starter',
     description: 'A simple full-body routine for beginners.',
-    exercises: ['push-up', 'squat', 'plank'],
+    exercises: ['push-up', 'squat'],
     createdDate: new Date().toISOString(),
     tags: ['beginner', 'full-body'],
   },
