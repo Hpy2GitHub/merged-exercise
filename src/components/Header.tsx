@@ -102,6 +102,7 @@ export const Header = ({
           )}
 
           {/* Import Button with File Input */}
+          {features.canImport && (
           <label className="cursor-pointer" title="Import data from backup file">
             <input
               type="file"
@@ -109,11 +110,13 @@ export const Header = ({
               onChange={onImport}
               className="hidden"
             />
+
             <div className="flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium">
               <Upload size={20} />
               Import
             </div>
           </label>
+          )}
           
           {features.canExport && (
           <button

@@ -1,5 +1,5 @@
 // src/components/ExerciseCard.tsx
-import { ComponentType, useState } from 'react';
+import { useState } from 'react';
 import { Eye, Edit2, Trash2, ImageOff } from 'lucide-react';
 import { Exercise, ExerciseList } from '../types';
 import { getThumbnailUrl, getPublicUrl } from '../utils/paths';
@@ -31,20 +31,14 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
       : getThumbnailUrl(exercise.thumbnailLink)
     : getThumbnailUrl(`${exercise.key}.jpg`);
 
-
-  // Construct the thumbnail path
-  const old_thumbnailPath = exercise.thumbnailLink 
-    ? getThumbnailUrl(exercise.thumbnailLink)
-    : getThumbnailUrl(`${exercise.key}.jpg`);
-
   // Get lists containing this exercise
   const exerciseLists = lists.filter(list => list.exercises.includes(exercise.key));
 
   return (
     <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full">
-      {/* Thumbnail Image */}
+      {/* Thumbnail Image — only rendered when features.showImages is true */}
       <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-        {!imageError ? (
+        {features.showImages && !imageError ? (
           <>
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center">
@@ -53,19 +47,22 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
             )}
             <img
               src={thumbnailPath}
-	      loading="lazy"
+              loading="lazy"
               alt={exercise.name}
               className={`w-full h-full object-cover transition-opacity duration-300 ${
                 imageLoaded ? 'opacity-100' : 'opacity-0'
               }`}
-              onLoad={() => {setImageLoaded(true);console.log('Image loaded successfully:', exercise.name);}}
+              onLoad={() => {
+                setImageLoaded(true);
+                console.log('Image loaded successfully:', exercise.name);
+              }}
               onError={(e) => {
                 setImageError(true);
                 setImageLoaded(false);
                 console.log('Image failed to load:', {
-                   src: e.currentTarget.src,
-                   exercise: exercise.name,
-                   key: exercise.key
+                  src: e.currentTarget.src,
+                  exercise: exercise.name,
+                  key: exercise.key
                 });
               }}
             />
@@ -76,7 +73,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
             <span className="text-sm">No image available</span>
           </div>
         )}
-        
+
         {/* Number badge overlay */}
         <div className="absolute top-3 left-3">
           <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
@@ -84,7 +81,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </span>
         </div>
 
-        {/* List Count Badge - NEW */}
+        {/* List Count Badge */}
         {exerciseLists.length > 0 && (
           <div className="absolute top-3 left-16">
             <span className="px-2 py-1 bg-green-600 text-white rounded-full text-xs font-bold shadow-lg">
@@ -93,7 +90,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </div>
         )}
 
-        {/* Action buttons overlay */}
+        {/* Action buttons overlay — Edit and Delete only shown when features.canEdit is true */}
         <div className="absolute top-3 right-3 flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
           <button
             onClick={() => onView(index)}
@@ -102,20 +99,24 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
           >
             <Eye size={18} className="text-indigo-600" />
           </button>
-          <button
-            onClick={() => onEdit(index)}
-            className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
-            title="Edit"
-          >
-            <Edit2 size={18} className="text-blue-600" />
-          </button>
-          <button
-            onClick={() => onDelete(index)}
-            className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
-            title="Delete"
-          >
-            <Trash2 size={18} className="text-red-600" />
-          </button>
+          {features.canEdit && (
+            <button
+              onClick={() => onEdit(index)}
+              className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
+              title="Edit"
+            >
+              <Edit2 size={18} className="text-blue-600" />
+            </button>
+          )}
+          {features.canEdit && (
+            <button
+              onClick={() => onDelete(index)}
+              className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
+              title="Delete"
+            >
+              <Trash2 size={18} className="text-red-600" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -173,7 +174,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
             </div>
           )}
 
-          {/* List Badges - NEW */}
+          {/* List Badges */}
           {exerciseLists.length > 0 && (
             <div>
               <span className="font-semibold text-gray-700">In Lists:</span>

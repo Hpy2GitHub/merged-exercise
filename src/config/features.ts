@@ -52,6 +52,7 @@ export const features = {
   showListsView: import.meta.env.VITE_SHOW_LISTS_VIEW === 'true',
 
   /** Show the DefaultDataBanner ("you are viewing sample data") */
+  /** not being used right now */
   showDefaultDataBanner: import.meta.env.VITE_SHOW_DEFAULT_DATA_BANNER === 'true',
 
   /** Do or Don't check local storage (bundled exercises.json) for data */

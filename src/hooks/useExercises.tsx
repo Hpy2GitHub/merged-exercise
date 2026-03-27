@@ -164,7 +164,8 @@ validatedExercises.forEach(ex => {
    *   3. localStorage - bundled json in project
    *   4. DEFAULT_DATA — first ever launch fallback
    */
-  const loadInitialData = async (): Promise<void> => {
+const loadInitialData = async (): Promise<void> => {
+
     // 1. Try the API first
     try {
       console.log('🌐 Loading from API…');
@@ -175,44 +176,69 @@ validatedExercises.forEach(ex => {
         setExercises(validatedExercises);
         setLists(validatedLists);
         setIsUsingDefaults(isUsingDefaultData(validatedExercises));
-        // Keep localStorage in sync with whatever the server returned
         localStorage.setItem('exercises-data', JSON.stringify(apiData));
         console.log('✅ Loaded from API');
         return;
       }
 
-      console.log('API returned empty data — falling through to localStorage');
+      console.log('API returned empty data — falling through');
     } catch (err) {
-      console.warn('⚠️  API load failed — falling back to localStorage:', err);
+      console.warn('⚠️  API load failed:', err);
     }
 
-      // 2. Try browserStorage
-      if (features.canUseBrowserData) {
-        try {
-          const saved = localStorage.getItem('exercises-data');
-          if (saved) {
-            const rawData = JSON.parse(saved);
-            const { exercises: validatedExercises, lists: validatedLists } = validateAndParseData(rawData);
-      
-            if (validatedExercises.length > 0) {
-              setExercises(validatedExercises);
-              setLists(validatedLists);
-              setIsUsingDefaults(isUsingDefaultData(validatedExercises));
-              console.log('✅ Loaded from localStorage (API was unavailable)');
-              return;
-            }
-          }
-        } catch (err) {
-          console.warn('⚠️ browserStorage load failed:', err);
-        }
-      }
+    // 2. Try browserStorage (window.localStorage) — disabled on GitHub to avoid
+    //    stale data confusion during development and testing
+    if (features.canUseBrowserData) {
+      try {
+        const saved = localStorage.getItem('exercises-data');
+        if (saved) {
+          const rawData = JSON.parse(saved);
+          const { exercises: validatedExercises, lists: validatedLists } = validateAndParseData(rawData);
 
-    // 4. Fall back to built-in defaults
+          if (validatedExercises.length > 0) {
+            setExercises(validatedExercises);
+            setLists(validatedLists);
+            setIsUsingDefaults(isUsingDefaultData(validatedExercises));
+            console.log('✅ Loaded from browserStorage');
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('⚠️ browserStorage load failed:', err);
+      }
+    }
+
+    // 3. Try static exercises.json bundled in the repo (public/exercises.json)
+    //    This is the main data source for GitHub Pages — no server required.
+    //    Gated on canUseLocalData (nothing to do with browserStorage).
+    if (features.canUseLocalData) {
+      try {
+        const url = `${import.meta.env.BASE_URL}exercises.json`;
+        console.log('📂 Loading from bundled JSON…', url);
+        const response = await fetch(url);
+        if (response.ok) {
+          const rawData = await response.json();
+          const { exercises: validatedExercises, lists: validatedLists } = validateAndParseData(rawData);
+
+          if (validatedExercises.length > 0) {
+            setExercises(validatedExercises);
+            setLists(validatedLists);
+            setIsUsingDefaults(isUsingDefaultData(validatedExercises));
+            console.log('✅ Loaded from bundled exercises.json');
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('⚠️ Bundled JSON load failed:', err);
+      }
+    }
+
+    // 4. Last resort — hardcoded sample exercises
     console.log('📦 Loading default exercise data…');
     setExercises(DEFAULT_DATA.exercises);
     setLists(DEFAULT_DATA.lists);
     setIsUsingDefaults(true);
-    saveData(DEFAULT_DATA.exercises, DEFAULT_DATA.lists); // persist defaults everywhere
+    saveData(DEFAULT_DATA.exercises, DEFAULT_DATA.lists);
     console.log('✅ Default data loaded and saved');
   };
 
