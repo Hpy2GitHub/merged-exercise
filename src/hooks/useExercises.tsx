@@ -160,8 +160,9 @@ validatedExercises.forEach(ex => {
   /**
    * Load order:
    *   1. API   — the server is the source of truth
-   *   2. localStorage — offline / API-down fallback
-   *   3. DEFAULT_DATA — first ever launch fallback
+   *   2. browserStorage — offline / API-down fallback
+   *   3. localStorage - bundled json in project
+   *   4. DEFAULT_DATA — first ever launch fallback
    */
   const loadInitialData = async (): Promise<void> => {
     // 1. Try the API first
@@ -185,29 +186,8 @@ validatedExercises.forEach(ex => {
       console.warn('⚠️  API load failed — falling back to localStorage:', err);
     }
 
-      // 2. Try localStorage
-//    try {
-//      const saved = localStorage.getItem('exercises-data');
-//      if (saved) {
-//        const rawData = JSON.parse(saved);
-//        const { exercises: validatedExercises, lists: validatedLists } = validateAndParseData(rawData);
-//
-//        if (validatedExercises.length > 0) {
-//          setExercises(validatedExercises);
-//          setLists(validatedLists);
-//          setIsUsingDefaults(isUsingDefaultData(validatedExercises));
-//          console.log('✅ Loaded from localStorage (API was unavailable)');
-//          return;
-      //        }
-      //      }
-      // 2. Try localStorage
-      //    } catch (err) {
-      //      console.warn('⚠️  localStorage load failed:', err);
-      //    }
-      
-      // 2. Try localStorage
-            // 2. Try localStorage
-      if (features.canUseLocalData) {
+      // 2. Try browserStorage
+      if (features.canUseBrowserData) {
         try {
           const saved = localStorage.getItem('exercises-data');
           if (saved) {
@@ -223,12 +203,11 @@ validatedExercises.forEach(ex => {
             }
           }
         } catch (err) {
-          console.warn('⚠️ localStorage load failed:', err);
+          console.warn('⚠️ browserStorage load failed:', err);
         }
       }
 
-
-    // 3. Fall back to built-in defaults
+    // 4. Fall back to built-in defaults
     console.log('📦 Loading default exercise data…');
     setExercises(DEFAULT_DATA.exercises);
     setLists(DEFAULT_DATA.lists);
