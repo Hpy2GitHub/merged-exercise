@@ -36,89 +36,92 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full">
-      {/* Thumbnail Image — only rendered when features.showImages is true */}
-      <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-        {features.showImages && !imageError ? (
-          <>
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="animate-pulse text-gray-400">Loading...</div>
-              </div>
-            )}
-            <img
-              src={thumbnailPath}
-              loading="lazy"
-              alt={exercise.name}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              onLoad={() => {
-                setImageLoaded(true);
-                console.log('Image loaded successfully:', exercise.name);
-              }}
-              onError={(e) => {
-                setImageError(true);
-                setImageLoaded(false);
-                console.log('Image failed to load:', {
-                  src: e.currentTarget.src,
-                  exercise: exercise.name,
-                  key: exercise.key
-                });
-              }}
-            />
-          </>
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-            <ImageOff size={48} className="mb-2" />
-            <span className="text-sm">No image available</span>
-          </div>
-        )}
 
-        {/* Number badge overlay */}
-        <div className="absolute top-3 left-3">
-          <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
-            {index + 1}
-          </span>
-        </div>
+{/* Thumbnail Image — entire block hidden when features.showImages is false */}
+      {features.showImages && (
+        <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+          {!imageError ? (
+            <>
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="animate-pulse text-gray-400">Loading...</div>
+                </div>
+              )}
+              <img
+                src={thumbnailPath}
+                loading="lazy"
+                alt={exercise.name}
+                className={`w-full h-full object-cover transition-opacity duration-300 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                onLoad={() => {
+                  setImageLoaded(true);
+                  console.log('Image loaded successfully:', exercise.name);
+                }}
+                onError={(e) => {
+                  setImageError(true);
+                  setImageLoaded(false);
+                  console.log('Image failed to load:', {
+                    src: e.currentTarget.src,
+                    exercise: exercise.name,
+                    key: exercise.key
+                  });
+                }}
+              />
+            </>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+              <ImageOff size={48} className="mb-2" />
+              <span className="text-sm">No image available</span>
+            </div>
+          )}
 
-        {/* List Count Badge */}
-        {exerciseLists.length > 0 && (
-          <div className="absolute top-3 left-16">
-            <span className="px-2 py-1 bg-green-600 text-white rounded-full text-xs font-bold shadow-lg">
-              {exerciseLists.length} {exerciseLists.length === 1 ? 'List' : 'Lists'}
+          {/* Number badge overlay */}
+          <div className="absolute top-3 left-3">
+            <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+              {index + 1}
             </span>
           </div>
-        )}
 
-        {/* Action buttons overlay — Edit and Delete only shown when features.canEdit is true */}
-        <div className="absolute top-3 right-3 flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onView(index)}
-            className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
-            title="View Details"
-          >
-            <Eye size={18} className="text-indigo-600" />
-          </button>
-          {features.canEdit && (
-            <button
-              onClick={() => onEdit(index)}
-              className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
-              title="Edit"
-            >
-              <Edit2 size={18} className="text-blue-600" />
-            </button>
+          {/* List Count Badge */}
+          {exerciseLists.length > 0 && (
+            <div className="absolute top-3 left-16">
+              <span className="px-2 py-1 bg-green-600 text-white rounded-full text-xs font-bold shadow-lg">
+                {exerciseLists.length} {exerciseLists.length === 1 ? 'List' : 'Lists'}
+              </span>
+            </div>
           )}
-          {features.canEdit && (
+
+          {/* Action buttons overlay — Edit and Delete only shown when features.canEdit is true */}
+          <div className="absolute top-3 right-3 flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
             <button
-              onClick={() => onDelete(index)}
+              onClick={() => onView(index)}
               className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
-              title="Delete"
+              title="View Details"
             >
-              <Trash2 size={18} className="text-red-600" />
+              <Eye size={18} className="text-indigo-600" />
             </button>
-          )}
+            {features.canEdit && (
+              <button
+                onClick={() => onEdit(index)}
+                className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
+                title="Edit"
+              >
+                <Edit2 size={18} className="text-blue-600" />
+              </button>
+            )}
+            {features.canEdit && (
+              <button
+                onClick={() => onDelete(index)}
+                className="p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition"
+                title="Delete"
+              >
+                <Trash2 size={18} className="text-red-600" />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Card Body */}
       <div className="p-6 flex-1">
