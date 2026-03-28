@@ -10,7 +10,8 @@ lerna-debug.log*
 bak/
 bak/*
 *.mp4
-public/videos
+videos/*
+public/videos/*
 
 node_modules
 dist

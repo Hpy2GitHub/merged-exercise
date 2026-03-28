@@ -1,3 +1,3 @@
-#!/usr/bin/bashj
+#!/usr/bin/bash
 echo ./deploy.sh apache
 ./deploy.sh apache

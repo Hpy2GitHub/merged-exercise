@@ -1,4 +1,0 @@
-github is loading w/o images but they look like they are missing and not "off"
-you need table view to add an exercise to a list -- want to add to detailed exercise view?
-.env.github - mostly settings are being ignored
-put on a password feature?

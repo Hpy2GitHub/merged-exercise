@@ -122,12 +122,12 @@ export const useExercises = () => {
 
 //---
 // In validateAndParseData, after mapping exercises, add:
-console.log('=== DEBUG: Toe exercises primaryMuscle ===');
-validatedExercises.forEach(ex => {
-  if (ex.name.toLowerCase().includes('toe')) {
-    console.log(`  ${ex.name}: primaryMuscle = "${ex.primaryMuscle}"`);
-  }
-});
+//console.log('=== DEBUG: Toe exercises primaryMuscle ===');
+//validatedExercises.forEach(ex => {
+//  if (ex.name.toLowerCase().includes('toe')) {
+//    console.log(`  ${ex.name}: primaryMuscle = "${ex.primaryMuscle}"`);
+//  }
+//});
 //---
 
       const validatedLists = lists.filter((list: any) => {

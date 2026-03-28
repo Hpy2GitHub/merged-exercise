@@ -14,4 +14,6 @@ pkill -f "npm" 2>/dev/null
 pkill -f "node.*react-scripts" 2>/dev/null
 pkill -f "start.js" 2>/dev/null
 
+pkill -f node
+
 echo "Done! Port 3001 should be free now."

@@ -1,0 +1,4 @@
+  console.log('MEDIA: ',name); 
+  console.log('MEDIA: ',hasVideo); 
+  console.log('MEDIA: ',videoUrl); 
+  console.log('MEDIA: ',fallbackImageUrl); 
