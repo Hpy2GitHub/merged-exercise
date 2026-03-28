@@ -167,23 +167,24 @@ validatedExercises.forEach(ex => {
 const loadInitialData = async (): Promise<void> => {
 
     // 1. Try the API first
-    try {
-      console.log('🌐 Loading from API…');
-      const apiData = await apiLoad();
-      const { exercises: validatedExercises, lists: validatedLists } = validateAndParseData(apiData);
-
-      if (validatedExercises.length > 0) {
-        setExercises(validatedExercises);
-        setLists(validatedLists);
-        setIsUsingDefaults(isUsingDefaultData(validatedExercises));
-        localStorage.setItem('exercises-data', JSON.stringify(apiData));
-        console.log('✅ Loaded from API');
-        return;
+    if (features.canUseApi) {
+      try {
+        console.log('🌐 Loading from API…');
+        const apiData = await apiLoad();
+        const { exercises: validatedExercises, lists: validatedLists } = validateAndParseData(apiData);
+  
+        if (validatedExercises.length > 0) {
+          setExercises(validatedExercises);
+          setLists(validatedLists);
+          setIsUsingDefaults(isUsingDefaultData(validatedExercises));
+          localStorage.setItem('exercises-data', JSON.stringify(apiData));
+          console.log('✅ Loaded from API');
+          return;
+        } 
+        console.log('API returned empty data — falling through');
+      } catch (err) {
+        console.warn('⚠️  API load failed:', err);
       }
-
-      console.log('API returned empty data — falling through');
-    } catch (err) {
-      console.warn('⚠️  API load failed:', err);
     }
 
     // 2. Try browserStorage (window.localStorage) — disabled on GitHub to avoid

@@ -60,6 +60,9 @@ export const features = {
 
   /** Do or Don't check browser storage for data (confusing while developing) */
   canUseBrowserData: import.meta.env.VITE_CAN_USE_BROWSER_DATA === 'true',
+
+  /** npm and apache will use the API but github will not */
+  canUseApi: import.meta.env.VITE_CAN_USE_API === 'true',
 } as const;
 
 // Convenience: true when ALL write features are off
